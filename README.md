@@ -1,5 +1,10 @@
 # multiple-network-deauth
-It is compiled with `make` on Linux
+It is compiled with `make` on Linux.
+**IT DOESN'T WORK ON WINDOWS**
+## Dependencies
+- `make`
+- `aircrack-ng`
+- `iwconfig`
 ## Usage
 Before you do anything, it would not be bad idea to run `touch networks.json`. Then, database file is networks.json.
 ### Add
