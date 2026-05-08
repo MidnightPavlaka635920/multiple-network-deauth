@@ -4,7 +4,7 @@ LDFLAGS = -lcurl
 
 # put artifacts in bin/ so the workspace stays clean
 BINDIR := bin
-TARGET ?= sdn
+TARGET ?= mnd
 
 SRC := $(wildcard src/*.cpp)
 OBJ := $(patsubst src/%.cpp,$(BINDIR)/%.o,$(SRC))
