@@ -1,6 +1,7 @@
 # multiple-network-deauth
 It is compiled with `make` on Linux
 ## Usage
+Before you do anything, it would not be bad idea to run `touch networks.json`. Then, database file is networks.json.
 ### Add
 Example: `sdn add AA:BB:CC:11:22:33 4 networks.jsom`
 Arguments in order:
