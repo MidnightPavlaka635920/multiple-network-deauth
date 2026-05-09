@@ -10,6 +10,12 @@
 #include <vector>
 #include <thread>
 using json = nlohmann::json;
+void help(){
+    std::cout << "Usage:\n";
+    std::cout << "  add <bssid> <channel> <db_path> - Add a network to the database\n";
+    std::cout << "  remove <bssid> <db_path> - Remove a network from the database\n";
+    std::cout << "  takedown <packet_number> <interface> <db_path> - Deauth all networks in the database\n";
+}
 bool run_command(const char* program, char* const argv[]) {
 
     pid_t pid = fork();
@@ -31,6 +37,7 @@ int main(int argc, char* argv[]){
     if (argc < 3){
         std::cerr <<"Every function here has more than 1 argument." << std::endl;
         return 1;
+        help();
     }
     std::string operation = argv[1];
     if (operation == "add"){
@@ -124,5 +131,11 @@ int main(int argc, char* argv[]){
         for (pid_t pid : children) {
             waitpid(pid, nullptr, 0);
         }
-    } 
+    }else if (operation == "help") {
+        help();
+    } else {
+        std::cerr << "Unknown operation: " << operation << std::endl;
+        help();
+        return 1;
+    }
 }
