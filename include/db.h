@@ -12,3 +12,8 @@ void add_entry(
     const int channel
 );
 void remove_entry(const std::string& bssid);
+struct Network {
+    std::string bssid;
+    int channel;
+};
+std::vector<Network> load_any_database(const std::string& path);

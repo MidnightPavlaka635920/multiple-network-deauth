@@ -16,6 +16,7 @@ void help(){
     std::cout << "  remove <bssid> <db_path> - Remove a network from the database\n";
     std::cout << "  takedown <packet_number> <interface> <db_path> - Deauth all networks in the database\n";
 }
+
 bool run_command(const char* program, char* const argv[]) {
 
     pid_t pid = fork();
@@ -82,18 +83,16 @@ int main(int argc, char* argv[]){
         std::string interface = argv[3];
         std::string path = argv[4];
 
-        set_path(path);
+        //set_path(path);
 
-        json j = load_bssid_database();
+        //json j = load_bssid_database();
+        auto j = load_any_database(path);
 
-        if (!j.is_array() || j.empty()) {
-            std::cerr << "Database empty or invalid\n";
-            return 1;
-        }
         std::vector<pid_t> children;
 
         for (auto& network : j) {
-            std::string bssid = network["bssid"].get<std::string>();
+            std::string bssid = network.bssid;
+            int channel = network.channel;
             pid_t bg = fork();
 
             if (bg == 0) {
@@ -112,7 +111,7 @@ int main(int argc, char* argv[]){
                     (char*)"iwconfig",
                     (char*)interface.c_str(),
                     (char*)"channel",
-                    (char*)std::to_string(network["channel"].get<int>()).c_str(),
+                    (char*)std::to_string(channel).c_str(),
                     nullptr
                 };
 
