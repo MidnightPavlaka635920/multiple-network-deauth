@@ -1,0 +1,12 @@
+
+BSSID, First time seen, Last time seen, channel, Speed, Privacy, Cipher, Authentication, Power, # beacons, # IV, LAN IP, ID-length, ESSID, Key
+04:95:E6:89:DA:E2, 2026-05-14 15:15:05, 2026-05-14 15:15:10,  6, 270, WPA2, CCMP, PSK, -25,        9,        1,   0.  0.  0.  0,   8, 2.4SiBar, 
+4C:D1:A1:2E:3B:67, 2026-05-14 15:15:05, 2026-05-14 15:15:08,  1, 130, WPA2, CCMP, PSK, -86,        5,        0,   0.  0.  0.  0,  16, HUAWEI-B311-3B67, 
+4C:D1:A1:2E:3B:6A, 2026-05-14 15:15:05, 2026-05-14 15:15:06,  1, 130, WPA2, CCMP, PSK, -30,        4,        0,   0.  0.  0.  0,   0, , 
+08:40:F3:44:7F:01, 2026-05-14 15:15:06, 2026-05-14 15:15:08,  3, 270, WPA2, CCMP, PSK, -59,        9,        0,   0.  0.  0.  0,  11, MaliPaki2.4, 
+74:6F:88:D2:C9:E3, 2026-05-14 15:15:08, 2026-05-14 15:15:09, 11, 270, WPA2, CCMP, PSK, -79,        4,        0,   0.  0.  0.  0,  15, ZTE_H168ND2C9E3, 
+00:1E:69:9F:70:03, 2026-05-14 15:15:08, 2026-05-14 15:15:09, 11,  54, WPA2 WPA, CCMP TKIP, PSK, -73,        5,        0,   0.  0.  0.  0,   8, Rasajski, 
+
+Station MAC, First time seen, Last time seen, Power, # packets, BSSID, Probed ESSIDs
+00:23:CD:F4:EB:DE, 2026-05-14 15:15:05, 2026-05-14 15:15:09, -78,       25, (not associated) ,Thom_D012308
+
