@@ -79,4 +79,77 @@ void remove_entry(const std::string& bssid) {
         }
     }
     save_bssid_database(new_db);
+} 
+std::vector<Network> load_any_database(const std::string& path) {
+
+    std::vector<Network> networks;
+
+    std::ifstream file(path);
+
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open file");
+    }
+
+    try {
+
+        json j;
+        file >> j;
+
+        if (!j.is_array()) {
+            throw std::runtime_error("JSON is not array");
+        }
+
+        for (const auto& item : j) {
+
+            Network n;
+
+            n.bssid =
+                item["bssid"].get<std::string>();
+
+            n.channel =
+                item["channel"].get<int>();
+
+            networks.push_back(n);
+        }
+
+        std::cout << "Loaded JSON database\n";
+
+        return networks;
+
+    } catch (...) {
+
+        // Reset stream state
+        file.clear();
+        file.seekg(0);
+
+        std::cout << "Not JSON, trying TXT format\n";
+    }
+
+    // -------------------------
+    // TXT parser
+    // -------------------------
+    std::string line;
+
+    while (std::getline(file, line)) {
+
+        if (line.empty()) {
+            continue;
+        }
+
+        std::stringstream ss(line);
+
+        Network n;
+
+        ss >> n.bssid >> n.channel;
+
+        if (ss.fail()) {
+            std::cerr << "Invalid line: "
+                      << line << std::endl;
+            continue;
+        }
+
+        networks.push_back(n);
+    }
+
+    return networks;
 }
