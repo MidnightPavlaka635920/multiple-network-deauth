@@ -35,10 +35,10 @@ bool run_command(const char* program, char* const argv[]) {
     return WIFEXITED(status) && WEXITSTATUS(status) == 0;
 }
 int main(int argc, char* argv[]){
-    if (argc < 3){
-        std::cerr <<"Every function here has more than 1 argument." << std::endl;
-        return 1;
+    if (argc < 2){
+        std::cerr <<"You need to enter an operation." << std::endl;
         help();
+        return 1;
     }
     std::string operation = argv[1];
     if (operation == "add"){
